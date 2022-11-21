@@ -16,7 +16,9 @@ import androidx.navigation.compose.rememberNavController
 import com.yoriworks.instagramclone.auth.LoginScreen
 import com.yoriworks.instagramclone.auth.SignupScreen
 import com.yoriworks.instagramclone.main.FeedScreen
+import com.yoriworks.instagramclone.main.MyPostScreen
 import com.yoriworks.instagramclone.main.NotificationMessage
+import com.yoriworks.instagramclone.main.SearchScreen
 import com.yoriworks.instagramclone.ui.theme.InstagramCloneTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -42,6 +44,8 @@ sealed class DestinationScreen(val route: String) {
     object Signup : DestinationScreen("signup")
     object Login : DestinationScreen("login")
     object Feed : DestinationScreen("feed")
+    object Search : DestinationScreen("search")
+    object MyPost : DestinationScreen("mypost")
 }
 
 @Composable
@@ -60,6 +64,12 @@ fun InstagramApp() {
         }
         composable(DestinationScreen.Feed.route) {
             FeedScreen(navController = navController, vm = vm)
+        }
+        composable(DestinationScreen.Search.route) {
+            SearchScreen(navController = navController, vm = vm)
+        }
+        composable(DestinationScreen.MyPost.route) {
+            MyPostScreen(navController = navController, vm = vm)
         }
     }
 

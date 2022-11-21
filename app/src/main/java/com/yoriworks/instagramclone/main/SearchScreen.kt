@@ -9,13 +9,13 @@ import androidx.navigation.NavController
 import com.yoriworks.instagramclone.InstagramCloneViewModel
 
 @Composable
-fun FeedScreen(navController: NavController, vm: InstagramCloneViewModel) {
+fun SearchScreen(navController: NavController,vm: InstagramCloneViewModel){
     Column(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = "Feed Screen")
+            Text(text = "Search Screen")
         }
         BottomNavigationMenu(
-            selectedItem = BottomNavigationItem.FEED,
+            selectedItem = BottomNavigationItem.SEARCH,
             navController = navController
         )
 
