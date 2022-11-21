@@ -13,7 +13,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.yoriworks.instagramclone.auth.LoginScreen
 import com.yoriworks.instagramclone.auth.SignupScreen
+import com.yoriworks.instagramclone.main.FeedScreen
 import com.yoriworks.instagramclone.main.NotificationMessage
 import com.yoriworks.instagramclone.ui.theme.InstagramCloneTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,20 +38,28 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-sealed class  DestinationScreen(val route:String){
-    object  Signup:DestinationScreen("signup")
+sealed class DestinationScreen(val route: String) {
+    object Signup : DestinationScreen("signup")
+    object Login : DestinationScreen("login")
+    object Feed : DestinationScreen("feed")
 }
 
 @Composable
 fun InstagramApp() {
     val vm = hiltViewModel<InstagramCloneViewModel>()
     val navController = rememberNavController()
-    
+
     NotificationMessage(vm = vm)
 
-    NavHost(navController = navController, startDestination = DestinationScreen.Signup.route){
-        composable(DestinationScreen.Signup.route){
+    NavHost(navController = navController, startDestination = DestinationScreen.Signup.route) {
+        composable(DestinationScreen.Signup.route) {
             SignupScreen(navController = navController, vm = vm)
+        }
+        composable(DestinationScreen.Login.route) {
+            LoginScreen(navController = navController, vm = vm)
+        }
+        composable(DestinationScreen.Feed.route) {
+            FeedScreen(navController = navController, vm = vm)
         }
     }
 

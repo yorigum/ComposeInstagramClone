@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -28,10 +29,10 @@ import com.yoriworks.instagramclone.main.CheckSignedIn
 import com.yoriworks.instagramclone.main.CommonProgressSpinner
 import com.yoriworks.instagramclone.main.navigateTo
 
-
 @Composable
-fun SignupScreen(navController: NavController, vm: InstagramCloneViewModel) {
+fun LoginScreen(navController: NavController, vm: InstagramCloneViewModel) {
     CheckSignedIn(navController = navController, vm = vm)
+    val focus = LocalFocusManager.current
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -42,7 +43,6 @@ fun SignupScreen(navController: NavController, vm: InstagramCloneViewModel) {
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val userNameState = remember { mutableStateOf(TextFieldValue()) }
             val emailState = remember { mutableStateOf(TextFieldValue()) }
             val passwordState = remember { mutableStateOf(TextFieldValue()) }
 
@@ -55,24 +55,18 @@ fun SignupScreen(navController: NavController, vm: InstagramCloneViewModel) {
                     .padding(bottom = 8.dp)
             )
             Text(
-                text = "Signup",
+                text = "Login",
                 modifier = Modifier.padding(8.dp),
                 fontSize = 30.sp,
                 fontFamily = FontFamily.SansSerif
             )
-            OutlinedTextField(value = userNameState.value, onValueChange = {
-                userNameState.value = it
-            },
-                modifier = Modifier.padding(8.dp),
-                label = { Text(text = "Username") }
-            )
-
             OutlinedTextField(value = emailState.value, onValueChange = {
                 emailState.value = it
             },
                 modifier = Modifier.padding(8.dp),
                 label = { Text(text = "Email") }
             )
+
 
             OutlinedTextField(
                 value = passwordState.value, onValueChange = {
@@ -85,27 +79,19 @@ fun SignupScreen(navController: NavController, vm: InstagramCloneViewModel) {
             )
             Button(
                 onClick = {
-                    if (userNameState.value.text.isNotEmpty() && emailState.value.text.isNotEmpty() && passwordState.value.text.isNotEmpty()) {
-                        vm.onSignup(
-                            userNameState.value.text,
-                            emailState.value.text,
-                            passwordState.value.text
-                        )
-                    } else {
-                        vm.handleException(customMessage = "field must entered")
-                    }
+                    focus.clearFocus(force = true)
+                    vm.onLogin(emailState.value.text, passwordState.value.text)
                 },
                 modifier = Modifier.padding(8.dp)
             ) {
-                Text(text = "Sign Up")
+                Text(text = "Login")
             }
-
             Text(
-                text = "Already a user? Go to login ->",
+                text = "New here? Go to signup ->",
                 modifier = Modifier
                     .padding(8.dp)
                     .clickable {
-                        navigateTo(navController, DestinationScreen.Login)
+                        navigateTo(navController, DestinationScreen.Signup)
                     },
                 color = Color.Blue,
             )
@@ -117,4 +103,5 @@ fun SignupScreen(navController: NavController, vm: InstagramCloneViewModel) {
         }
 
     }
+
 }
