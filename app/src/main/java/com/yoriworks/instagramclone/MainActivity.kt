@@ -13,7 +13,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.yoriworks.instagramclone.auth.LoginScreen
+import com.yoriworks.instagramclone.auth.ProfileScreen
 import com.yoriworks.instagramclone.auth.SignupScreen
 import com.yoriworks.instagramclone.main.FeedScreen
 import com.yoriworks.instagramclone.main.MyPostScreen
@@ -22,10 +24,13 @@ import com.yoriworks.instagramclone.main.SearchScreen
 import com.yoriworks.instagramclone.ui.theme.InstagramCloneTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private var mFirebaseAnalytics: FirebaseAnalytics? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         setContent {
             InstagramCloneTheme {
                 // A surface container using the 'background' color from the theme
@@ -46,6 +51,7 @@ sealed class DestinationScreen(val route: String) {
     object Feed : DestinationScreen("feed")
     object Search : DestinationScreen("search")
     object MyPost : DestinationScreen("mypost")
+    object Profile : DestinationScreen("profile")
 }
 
 @Composable
@@ -70,6 +76,9 @@ fun InstagramApp() {
         }
         composable(DestinationScreen.MyPost.route) {
             MyPostScreen(navController = navController, vm = vm)
+        }
+        composable(DestinationScreen.Profile.route) {
+            ProfileScreen(navController = navController, vm = vm)
         }
     }
 
