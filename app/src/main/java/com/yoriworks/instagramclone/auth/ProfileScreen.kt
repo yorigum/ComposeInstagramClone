@@ -1,9 +1,14 @@
 package com.yoriworks.instagramclone.auth
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -19,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.yoriworks.instagramclone.DestinationScreen
 import com.yoriworks.instagramclone.InstagramCloneViewModel
-import com.yoriworks.instagramclone.main.CheckSignedIn
 import com.yoriworks.instagramclone.main.CommonDivider
+import com.yoriworks.instagramclone.main.CommonImage
 import com.yoriworks.instagramclone.main.CommonProgressSpinner
 import com.yoriworks.instagramclone.main.navigateTo
 
@@ -43,9 +48,12 @@ fun ProfileScreen(navController: NavController, vm: InstagramCloneViewModel) {
             onNameChange = { name = it },
             onUsernameChange = { username = it },
             onBioChange = { bio = it },
-            onSave = { /*TODO*/ },
-            onBack = { navigateTo(navController,DestinationScreen.MyPost) },
-            onLogout = {})
+            onSave = { vm.updateProfileData(name, username, bio) },
+            onBack = { navigateTo(navController, DestinationScreen.MyPost) },
+            onLogout = {
+                vm.onLogout()
+                navigateTo(navController,DestinationScreen.Login)
+            })
     }
 }
 
@@ -63,6 +71,7 @@ fun ProfileContent(
     onLogout: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
+    val imgUrl = vm.userData.value?.imageUrl
     Column(
         modifier = Modifier
             .verticalScroll(scrollState)
@@ -78,13 +87,7 @@ fun ProfileContent(
         }
         CommonDivider()
         //User Image
-        Column(
-            modifier = Modifier
-                .height(200.dp)
-                .fillMaxWidth()
-                .background(Color.Gray)
-        ) {
-        }
+        ProfileImage(imageUrl = imgUrl, vm = vm )
         CommonDivider()
         Row(
             modifier = Modifier
@@ -155,5 +158,40 @@ fun ProfileContent(
 
             }
         }
+    }
+}
+
+@Composable
+fun ProfileImage(imageUrl: String?, vm: InstagramCloneViewModel) {
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()){
+        uri: Uri? ->
+        uri?.let {
+            vm.uploadProfileImage(uri)
+        }
+    }
+    Box(modifier = Modifier.height(IntrinsicSize.Min)) {
+        Column(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .clickable {
+                           launcher.launch("image/*")
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+            
+        ) {
+            Card(shape = CircleShape,
+            modifier = Modifier
+                .padding(8.dp)
+                .size(100.dp)) {
+                CommonImage(data = imageUrl)
+            }
+            Text(text = "Change profile picture")
+        }
+
+        val isLoading = vm.inProgress.value
+        if (isLoading) CommonProgressSpinner()
+
     }
 }

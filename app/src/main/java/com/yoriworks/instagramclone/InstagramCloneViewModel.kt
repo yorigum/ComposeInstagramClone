@@ -1,5 +1,6 @@
 package com.yoriworks.instagramclone
 
+import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -9,6 +10,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.yoriworks.instagramclone.data.Event
 import com.yoriworks.instagramclone.data.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.*
 import javax.inject.Inject
 
 const val USERS = "users"
@@ -25,7 +27,7 @@ class InstagramCloneViewModel @Inject constructor(
     val popupNotification = mutableStateOf<Event<String>?>(null)
 
     init {
-      //  auth.signOut()
+        //  auth.signOut()
         val currentUser = auth.currentUser
         signedIn.value = currentUser != null
         currentUser?.uid?.let { uid ->
@@ -151,5 +153,42 @@ class InstagramCloneViewModel @Inject constructor(
             }
 
 
+    }
+
+    fun updateProfileData(name: String, username: String, bio: String) {
+        createOrUpdateProfile(name, username, bio)
+    }
+
+    private fun uploadImage(uri: Uri, onSuccess: (Uri) -> Unit) {
+        inProgress.value = true
+
+        val storageRef = storage.reference
+        val uuid = UUID.randomUUID()
+        val imageRef = storageRef.child("images/$uuid")
+
+        val uploadTask = imageRef.putFile(uri)
+
+        uploadTask
+            .addOnSuccessListener {
+                val result = it.metadata?.reference?.downloadUrl
+                result?.addOnSuccessListener(onSuccess)
+            }
+            .addOnFailureListener { exc->
+                handleException(exc)
+                inProgress.value = false
+            }
+    }
+
+    fun uploadProfileImage(uri: Uri){
+        uploadImage(uri){
+            createOrUpdateProfile(imageUrl = it.toString())
+        }
+    }
+
+    fun onLogout(){
+        auth.signOut()
+        signedIn.value = false
+        userData.value = null
+        popupNotification.value = Event("Logged out!")
     }
 }
